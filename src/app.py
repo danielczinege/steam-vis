@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
 import numpy as np
+import calendar
 
 # Import existing helper functions for Layout 2
 from layout2_prep import load_dataset, l2_get_data
@@ -194,7 +195,7 @@ def create_stacked_area(long_df, time_col):
     fig.update_layout(height=450, margin=dict(l=20, r=20, t=60, b=40))
     return fig
 
-def create_upset_plot(df):
+def create_upset_plot(df, current_selection=""):
     # Pre-filter
     cols = ['windows', 'mac', 'linux']
     df_os = df[cols].fillna(0).astype(int)
@@ -216,7 +217,7 @@ def create_upset_plot(df):
             plot_data.append({'label': label, 'count': count, 'sets': sets})
             
     if not plot_data:
-        return go.Figure().update_layout(title="No OS Data")
+        return go.Figure().update_layout(title=f"No OS Data{current_selection}")
         
     df_plot = pd.DataFrame(plot_data).sort_values('count', ascending=False)
     
@@ -251,10 +252,12 @@ def create_upset_plot(df):
     ), row=2, col=1)
     
     fig.update_xaxes(autorange="reversed", row=2, col=1)
-    fig.update_layout(title="OS Compatibility", height=400)
+    # Modified title
+    fig.update_layout(title=f"OS Compatibility{current_selection}", height=400)
     return fig
 
-def create_bubble_chart(df):
+# Modified function signature to accept current_selection text
+def create_bubble_chart(df, current_selection=""):
     lang_counts = {}
     for raw in df['supported_languages']:
         for l in raw:
@@ -263,7 +266,7 @@ def create_bubble_chart(df):
                 lang_counts[l] = lang_counts.get(l, 0) + 1
 
     if not lang_counts:
-        return go.Figure().update_layout(title="No Data")
+        return go.Figure().update_layout(title=f"No Data{current_selection}")
 
     # Top 40
     sorted_langs = sorted(lang_counts.items(), key=lambda x: x[1], reverse=True)[:40]
@@ -299,7 +302,7 @@ def create_bubble_chart(df):
     ))
     
     fig.update_layout(
-        title="Top Supported Languages",
+        title=f"Top Supported Languages{current_selection}",
         xaxis=dict(visible=False), 
         yaxis=dict(visible=False, scaleanchor="x", scaleratio=1), # Keep aspect ratio circular
         height=400, 
@@ -422,6 +425,12 @@ app.layout = html.Div(style={'backgroundColor': '#f0f0f0', 'padding': '20px', 'f
 # CALLBACKS - LAYOUT 1
 # ==========================================
 
+def convert_month_number_to_name(month_num):
+    """Convert month number to month name."""
+    if 1 <= month_num <= 12:
+        return calendar.month_name[month_num]
+    return str(month_num)
+
 @app.callback(
     Output('heatmap_plot', 'figure'),
     Output('stacked_plot', 'figure'),
@@ -440,6 +449,9 @@ def update_all_layout1_charts(clickData, reset, time_changed, time_col):
     selected_time = None
     selected_genre = None
     
+    # Variable to hold the text description of the selection
+    selection_title_suffix = ""
+
     if ctx_id == 'heatmap_plot' and clickData:
         pt = clickData['points'][0]
         curve_num = pt.get('curveNumber', 1)
@@ -452,10 +464,13 @@ def update_all_layout1_charts(clickData, reset, time_changed, time_col):
             if time_col in ['release_year', 'release_month']:
                 x_val = int(x_val)
 
+        title_text = "year" if time_col == "release_year" else "month"
+
         # Trace 0=TopHist (Time), 1=Heatmap (Time+Genre), 2=RightHist (Genre)
         if curve_num == 0: 
             df_filt = df_filt[df_filt[time_col] == x_val]
             selected_time = x_val
+            selection_title_suffix = f" ({title_text}: {x_val if time_col == 'release_year' else convert_month_number_to_name(x_val)})"
         elif curve_num == 1:
             df_filt = df_filt[df_filt[time_col] == x_val]
             df_filt = df_filt[df_filt['genres'].apply(
@@ -463,11 +478,13 @@ def update_all_layout1_charts(clickData, reset, time_changed, time_col):
             )]
             selected_time = x_val
             selected_genre = y_val
+            selection_title_suffix = f" (genre: {y_val}, {title_text}: {x_val if time_col == 'release_year' else convert_month_number_to_name(x_val)})"
         elif curve_num == 2:
             df_filt = df_filt[df_filt['genres'].apply(
                 lambda x: str(y_val) in list(x)
             )]
             selected_genre = y_val
+            selection_title_suffix = f" (genre: {y_val})"
     
     # Generate all charts
     matrix, long_df, time_counts = get_aggregated_data(DF_MAIN, time_col)
@@ -478,8 +495,9 @@ def update_all_layout1_charts(clickData, reset, time_changed, time_col):
     if ctx_id == 'heatmap_plot' and (selected_time is not None or selected_genre is not None):
         fig_heatmap = add_heatmap_highlight(fig_heatmap, selected_time, selected_genre)
 
-    fig_upset = create_upset_plot(df_filt)
-    fig_bubble = create_bubble_chart(df_filt)
+    # Pass the selection title suffix to the plot creators
+    fig_upset = create_upset_plot(df_filt, selection_title_suffix)
+    fig_bubble = create_bubble_chart(df_filt, selection_title_suffix)
     
     return fig_heatmap, fig_stacked, fig_upset, fig_bubble
 
