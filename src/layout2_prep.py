@@ -8,7 +8,7 @@ PCS_POS = -1  # last attribute
 
 
 def load_dataset():
-    df = pd.read_pickle('./data/games_processed.pkl')
+    df = pd.read_pickle('../data/games_processed.pkl')
 
     # To numpy array
     return df
