@@ -159,3 +159,19 @@ def l2_get_data(df, distribution: bool, quantity: int, free: bool):
     p_data = p_data.rename(columns={0: data_name})
     d_data = d_data.rename(columns={0: data_name})
     return g_data, p_data, d_data
+    
+
+def get_range_boxplot(data, cat, val):
+    ranges = []
+
+    for _, g in data.groupby(cat):
+        y = g[val].to_numpy()
+        q1, q3 = np.percentile(y, [25, 75])
+        iqr = q3 - q1
+        ranges.append((q1 - 1.5 * iqr, q3 + 1.5 * iqr))
+
+    lower = min(r[0] for r in ranges)
+    upper = max(r[1] for r in ranges)
+    # A bit of a buffer
+    return lower - 5, upper + 5 
+    
