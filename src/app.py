@@ -7,7 +7,7 @@ import numpy as np
 import calendar
 
 # Import existing helper functions for Layout 2
-from layout2_prep import load_dataset, l2_get_data
+from layout2_prep import load_dataset, l2_get_data, get_range_boxplot
 # Import the bubble chart class
 from bubble_chart import BubbleChartPlotly
 
@@ -543,11 +543,25 @@ def update_by_genres(show: str, quantity: str, free: bool,
         genres_fig = px.bar(genres_data, labels={'index': 'Genre', 'value': y_val})
         prices_fig = px.bar(prices_data, labels={'index': 'Prices', 'value': y_val})
         dlcs_fig = px.bar(dlcs_data, labels={'index': 'Number of Dlcs', 'value': y_val})
-    # Violin plot
+    # Box plots
     else:
-        genres_fig = px.violin(genres_data, y=y_val, x="Genre", color="Genre", box=True)
-        prices_fig = px.violin(prices_data, y=y_val, x="Price ranges", color="Price ranges", box=True)
-        dlcs_fig =  px.violin(dlcs_data, y=y_val, x="Number of Dlcs", color="Number of Dlcs", box=True)
+        genres_fig = px.box(genres_data, y=y_val, x="Genre", color="Genre")
+        prices_fig = px.box(prices_data, y=y_val, x="Price ranges", color="Price ranges")
+        dlcs_fig =  px.box(dlcs_data, y=y_val, x="Number of Dlcs", color="Number of Dlcs")
+        
+        # Do not plot outliers
+        genres_fig.update_traces(boxpoints='outliers', marker=dict(opacity=0))
+        lower, upper = get_range_boxplot(genres_data, "Genre", y_val)
+        genres_fig.update_yaxes(range=[lower, upper])
+        
+        if y_val != "Price":
+            prices_fig.update_traces(boxpoints='outliers', marker=dict(opacity=0))
+            lower, upper = get_range_boxplot(prices_data, "Price ranges", y_val)
+            prices_fig.update_yaxes(range=[lower, upper])
+        
+        dlcs_fig.update_traces(boxpoints='outliers', marker=dict(opacity=0))
+        lower, upper = get_range_boxplot(dlcs_data, "Number of Dlcs", y_val)
+        dlcs_fig.update_yaxes(range=[lower, upper])
 
     genres_fig.layout.update(showlegend=False)
     prices_fig.layout.update(showlegend=False)
