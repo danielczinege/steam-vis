@@ -11,6 +11,7 @@ from layout2_prep import load_dataset, l2_get_data
 from bubble_chart import BubbleChartPlotly
 
 app = Dash(__name__)
+server = app.server
 
 # ==========================================
 # DATA LOADING & PROCESSING
