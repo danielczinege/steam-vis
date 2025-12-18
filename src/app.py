@@ -411,12 +411,7 @@ app.layout = html.Div(style={'backgroundColor': '#f0f0f0', 'padding': '20px', 'f
             [dcc.Store(id="dlcs_figures_cached", data={}), 
              dcc.Graph(id="l2_dlcs")],
             style={'width': '45%', 'margin-top':'2%', 'display': 'inline-block'}
-        ),
-        
-        
-        #****************************Debug Output*************************************
-        html.Div([
-            dcc.Markdown(' **Debug output** '), html.Pre(id='debug-out')]),#element for pre-formatted text output, we will use callback to place 'clickData' (data generated on click) here
+        )
     ],
  )
 
