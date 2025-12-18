@@ -528,7 +528,6 @@ def update_by_genres(show: str, quantity: str, free: bool,
     radio_value = show if not quantity == "count" else "avg"
     # Only need to check one cache - if cached for genres, must be cached for other figures as well
     if key in genres_cache:
-        print("cached")
         return genres_cache[key], prices_cache[key], dlcs_cache[key], genres_cache, prices_cache, dlcs_cache, radio_value
 
     dist = True if (show == "dist" and not quantity == "count") else False
