@@ -48,7 +48,6 @@ def dlcs_info(data, distribution: bool, quantity: int):
         quantity_per_dlc_r = {DLCS_MAPPING[i]: quantity_per_dlc_r[i] 
                                 for i in range(len(DLC_RANGES) + 1)}
     else:
-        print("dlcs distribution")
         for_dataframe = []
         for dlc_range in quantity_per_dlc_r.keys():
             for value in quantity_per_dlc_r[dlc_range]:
@@ -59,7 +58,6 @@ def dlcs_info(data, distribution: bool, quantity: int):
 
 
 def prices_info(data, distribution: bool, quantity: int, free: bool):
-    print("in prices info")
     if quantity == 2:
         return pd.DataFrame([], columns=["Price ranges", 0])
     
@@ -70,8 +68,6 @@ def prices_info(data, distribution: bool, quantity: int, free: bool):
         quantity_per_price_r = {price_r: [0] for price_r in range(len(PRICE_RANGES) + 1)}
     else:
         quantity_per_price_r = {price_r: [] for price_r in range(len(PRICE_RANGES) + 1)}
-
-    print("processing price")
 
     for row in range(len(data)):
         price: float = data[row][PRICE_POS]
@@ -84,15 +80,12 @@ def prices_info(data, distribution: bool, quantity: int, free: bool):
 
     start = 0 if not free else 1
     if not distribution and not count:
-        print("price one")
         quantity_per_price_r = {PRICES_MAPPING[i]: sum(quantity_per_price_r[i]) / len(quantity_per_price_r[i]) 
                                 for i in range(start, len(PRICE_RANGES) + 1)}
     elif not distribution:
-        print("price not dist")
         quantity_per_price_r = {PRICES_MAPPING[i]: quantity_per_price_r[i] 
                                 for i in range(start, len(PRICE_RANGES) + 1)}
     else:
-        print("price distribution")
         for_dataframe = []
         for price_range in quantity_per_price_r.keys():
             for value in quantity_per_price_r[price_range]:
