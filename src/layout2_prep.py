@@ -1,5 +1,6 @@
 import pandas as pd
 from utils import genre_mapping, GENRES, PRICE_RANGES, DLC_RANGES, PRICES_MAPPING, DLCS_MAPPING
+import numpy as np
 
 GENRES_POS = 3
 PRICE_POS = 8
