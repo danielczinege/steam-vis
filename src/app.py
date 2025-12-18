@@ -368,7 +368,7 @@ app.layout = html.Div(style={'backgroundColor': '#f0f0f0', 'padding': '20px', 'f
 
                 {'label': html.Div(['Average'],
                  style={'margin-bottom': '1%', 'display':'inline'}), 'value': 'avg'}], # options
-                'dist', # default
+                value='dist', # default
                 id='l2_show_choice'),
             
             "Quantity:",
@@ -382,7 +382,7 @@ app.layout = html.Div(style={'backgroundColor': '#f0f0f0', 'padding': '20px', 'f
                 {'label': html.Div(['Price'],
                  style={'margin-bottom': '1%', 'display':'inline'}), 'value': 'price'}
                 ],
-                'price', 
+                value='price', 
                 id='l2_quantity_choice'
             ),
             'Filter free games:', 
@@ -392,7 +392,7 @@ app.layout = html.Div(style={'backgroundColor': '#f0f0f0', 'padding': '20px', 'f
 
                 {'label': html.Div(['No'],
                  style={'margin-bottom': '1%', 'display':'inline'}), 'value': False}], # options
-                False, # default
+                value=False, # default
                 id='l2_free_games_choice')
            
             ], #inline layout of radiobuttons
@@ -514,6 +514,8 @@ def update_all_layout1_charts(clickData, reset, time_changed, time_col):
     Output("genres_figures_cached", "data"),
     Output("prices_figures_cached", "data"),
     Output("dlcs_figures_cached", "data"),
+    # Output radio button value
+    Output("l2_show_choice", "value"),
     # Input options
     Input("l2_show_choice", "value"),
     Input("l2_quantity_choice", "value"),
@@ -525,13 +527,16 @@ def update_all_layout1_charts(clickData, reset, time_changed, time_col):
 )
 def update_by_genres(show: str, quantity: str, free: bool, 
                      genres_cache, prices_cache, dlcs_cache):
+                         
     key: str = f"{show}/{quantity}/{free}"
+    # We cannot show the "distribution" of number of games so we always switch to "average"
+    radio_value = show if not quantity == "count" else "avg"
     # Only need to check one cache - if cached for genres, must be cached for other figures as well
     if key in genres_cache:
         print("cached")
-        return genres_cache[key], prices_cache[key], dlcs_cache[key], genres_cache, prices_cache, dlcs_cache
+        return genres_cache[key], prices_cache[key], dlcs_cache[key], genres_cache, prices_cache, dlcs_cache, radio_value
 
-    dist = True if show == "dist" else False
+    dist = True if (show == "dist" and not quantity == "count") else False
     qtty = 0 if quantity == "reviews" else (1 if quantity == "count" else 2)
     
     (genres_data, prices_data, dlcs_data) = l2_get_data(DATA_RAW, dist, qtty, free)
@@ -540,14 +545,16 @@ def update_by_genres(show: str, quantity: str, free: bool,
         
     # Barchart with average values    
     if not dist:
-        genres_fig = px.bar(genres_data, labels={'index': 'Genre', 'value': y_val})
-        prices_fig = px.bar(prices_data, labels={'index': 'Prices', 'value': y_val})
-        dlcs_fig = px.bar(dlcs_data, labels={'index': 'Number of Dlcs', 'value': y_val})
+        title = f"Average {y_val.title()} Per" if y_val != "Count" else "Number of Games Per"
+        genres_fig = px.bar(genres_data, labels={'index': 'Genre', 'value': y_val}, title=f"{title} Genre")
+        prices_fig = px.bar(prices_data, labels={'index': 'Prices', 'value': y_val}, title=f"{title} Price Range")
+        dlcs_fig = px.bar(dlcs_data, labels={'index': 'Number of Dlcs', 'value': y_val}, title=f"{title} Number Of Dlcs")
     # Box plots
     else:
-        genres_fig = px.box(genres_data, y=y_val, x="Genre", color="Genre")
-        prices_fig = px.box(prices_data, y=y_val, x="Price ranges", color="Price ranges")
-        dlcs_fig =  px.box(dlcs_data, y=y_val, x="Number of Dlcs", color="Number of Dlcs")
+        title = f"Distribution Of {y_val.title()} Per"
+        genres_fig = px.box(genres_data, y=y_val, x="Genre", color="Genre", title=f"{title} Genre")
+        prices_fig = px.box(prices_data, y=y_val, x="Price ranges", color="Price ranges", title=f"{title} Price Range")
+        dlcs_fig =  px.box(dlcs_data, y=y_val, x="Number of Dlcs", color="Number of Dlcs", title=f"{title} Number Of Dlcs")
         
         # Do not plot outliers
         genres_fig.update_traces(boxpoints='outliers', marker=dict(opacity=0))
@@ -571,7 +578,7 @@ def update_by_genres(show: str, quantity: str, free: bool,
     prices_cache[key] = prices_fig.to_dict()
     dlcs_cache[key] = dlcs_fig.to_dict()
         
-    return genres_fig, prices_fig, dlcs_fig, genres_cache, prices_cache, dlcs_cache
+    return genres_fig, prices_fig, dlcs_fig, genres_cache, prices_cache, dlcs_cache, radio_value
 
 #********RUNNING THE APP*************************************************
 if __name__ == '__main__':
