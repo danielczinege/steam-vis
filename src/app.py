@@ -536,7 +536,11 @@ def update_by_genres(show: str, quantity: str, free: bool,
     (genres_data, prices_data, dlcs_data) = l2_get_data(DATA_RAW, dist, qtty, free)
     
     y_val: str = genres_data.columns.values[0] if not dist else genres_data.columns.values[1]
-        
+    
+    y_axis_label = y_val
+    if quantity == 'price':
+        y_axis_label = f"{y_val} ($)"
+
     # Barchart with average values    
     if not dist:
         title = f"Average {y_val.title()} Per" if y_val != "Count" else "Number of Games Per"
@@ -563,6 +567,12 @@ def update_by_genres(show: str, quantity: str, free: bool,
         dlcs_fig.update_traces(boxpoints='outliers', marker=dict(opacity=0))
         lower, upper = get_range_boxplot(dlcs_data, "Number of Dlcs", y_val)
         dlcs_fig.update_yaxes(range=[lower, upper])
+
+    genres_fig.update_yaxes(title_text=y_axis_label)
+    prices_fig.update_yaxes(title_text=y_axis_label)
+    dlcs_fig.update_yaxes(title_text=y_axis_label)
+
+    prices_fig.update_xaxes(title_text="Price Ranges ($)")
 
     genres_fig.layout.update(showlegend=False)
     prices_fig.layout.update(showlegend=False)
