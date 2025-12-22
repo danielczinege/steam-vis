@@ -11,7 +11,7 @@ genre_mapping = {
     'Sports': 8, 
     'Action-Adventure': 9
     }
-GENRES = ['Casual', 'Racing', 'Indie', 'Sports', 'RPG', 'Simulation', 'Strategy', 'Action', 'Adventure', 'Action-Adventure']
+GENRES = ['Action', 'Adventure', 'Strategy', 'Casual', 'Indie', 'RPG', 'Simulation','Racing', 'Sports', 'Action-Adventure']
 # Ranges are (start, end] - inclusive from right
 PRICE_RANGES = [(-1, 0), (0, 5), (5, 10), (10, 20), (20, 50)]
 DLC_RANGES = [(-1, 0), (0, 1), (1, 2), (2, 5), (5, 10)]
