@@ -1,14 +1,14 @@
 # Mapping genres to indices - for the purpose of plotting heatmaps
 genre_mapping = {
-    'Casual' : 0, 
-    'Racing': 1, 
-    'Indie': 2, 
-    'Sports': 3, 
-    'RPG': 4, 
-    'Simulation': 5, 
-    'Strategy': 6, 
-    'Action': 7, 
-    'Adventure': 8, 
+    'Action' : 0, 
+    'Adventure': 1, 
+    'Strategy': 2, 
+    'Casual': 3, 
+    'Indie': 4, 
+    'RPG': 5, 
+    'Simulation': 6, 
+    'Racing': 7, 
+    'Sports': 8, 
     'Action-Adventure': 9
     }
 GENRES = ['Casual', 'Racing', 'Indie', 'Sports', 'RPG', 'Simulation', 'Strategy', 'Action', 'Adventure', 'Action-Adventure']
