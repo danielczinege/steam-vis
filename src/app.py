@@ -6,6 +6,8 @@ import pandas as pd
 import numpy as np
 import calendar
 
+from utils import GENRES
+
 # Import existing helper functions for Layout 2
 from layout2_prep import load_dataset, l2_get_data, get_range_boxplot
 # Import the bubble chart class
@@ -190,7 +192,8 @@ def create_stacked_area(long_df, time_col):
         x=time_col, 
         y="count", 
         color="genre",
-        title="Growth of Top 10 Genres"
+        title="Growth of Top 10 Genres",
+        category_orders={"genre": GENRES}
     )
     fig.update_layout(height=450, margin=dict(l=20, r=20, t=60, b=40))
     return fig
