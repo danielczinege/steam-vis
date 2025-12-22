@@ -551,8 +551,8 @@ def update_by_genres(show: str, quantity: str, free: bool,
     else:
         title = f"Distribution Of {y_val.title()} Per"
         genres_fig = px.box(genres_data, y=y_val, x="Genre", color="Genre", title=f"{title} Genre")
-        prices_fig = px.box(prices_data, y=y_val, x="Price ranges", color="Price ranges", title=f"{title} Price Range")
-        dlcs_fig =  px.box(dlcs_data, y=y_val, x="Number of Dlcs", color="Number of Dlcs", title=f"{title} Number Of Dlcs")
+        prices_fig = px.box(prices_data, y=y_val, x="Price ranges", color="Price ranges", title=f"{title} Price Range", color_discrete_sequence=px.colors.qualitative.Safe)
+        dlcs_fig =  px.box(dlcs_data, y=y_val, x="Number of Dlcs", color="Number of Dlcs", title=f"{title} Number Of Dlcs", color_discrete_sequence=px.colors.qualitative.Dark2)
         
         # Do not plot outliers
         genres_fig.update_traces(boxpoints='outliers', marker=dict(opacity=0))
